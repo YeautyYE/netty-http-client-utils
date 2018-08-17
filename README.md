@@ -20,7 +20,7 @@
 - get method
 
 ```java
-	String url = "http://www.baidu.com";
+    String url = "http://www.baidu.com";
 
     Map<String, String> headers = new HashMap<>();
     headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) Chrome/68.0.3440.106 Safari/537.36");
