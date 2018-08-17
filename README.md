@@ -1,9 +1,9 @@
 # netty-http-client-utils
 
-###Requirement
+### Requirement
 - jdk version 1.8 or 1.8+
 
-###Maven Dependencies
+### Maven Dependencies
 ```xml
 <dependency>
     <groupId>io.netty</groupId>
@@ -16,11 +16,10 @@
     <version>4.1.25.Final</version>
 </dependency>
 ```
-###Demo
+### Demo
 - get method
 
 ```java
-
 	String url = "http://www.baidu.com";
 
     Map<String, String> headers = new HashMap<>();
