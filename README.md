@@ -28,7 +28,7 @@
     String charset = "utf-8";
 
     NettyHttpClientUtils.doGet(url, headers, charset,
-            (content, httpHeaders, status, cause) -> {
+            (content, httpHeaders, status, throwable) -> {
                 System.out.println(content);
                 System.out.println(httpHeaders);
                 System.out.println(status);
@@ -50,7 +50,7 @@
     String charset = "utf-8";
 
     NettyHttpClientUtils.doPostForm(url, headers, param, charset,
-            (content, httpHeaders, status, cause) -> {
+            (content, httpHeaders, status, throwable) -> {
                 System.out.println(content);
                 System.out.println(httpHeaders);
                 System.out.println(status);
@@ -70,7 +70,7 @@
     String charset = "utf-8";
 
     NettyHttpClientUtils.doPostJson(url, headers, json, charset,
-            (content, httpHeaders, status, cause) -> {
+            (content, httpHeaders, status, throwable) -> {
                 System.out.println(content);
                 System.out.println(httpHeaders);
                 System.out.println(status);

@@ -15,6 +15,7 @@ import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -82,11 +83,11 @@ public abstract class NettyHttpClientUtils {
         }));
     }
 
-    public static void connect(String url, DefaultFullHttpRequest httpRequest, HttpCallback httpCallback) throws IOException {
+    public static void connect(String url, DefaultFullHttpRequest httpRequest, HttpCallback httpCallback) {
         URI uri = URI.create(url);
         String scheme = uri.getScheme();
         if (scheme == null || scheme.trim().equals("")) {
-            throw new IOException("scheme is empty");
+            httpCallback.response(null,null,new URISyntaxException(url,"scheme is empty"));
         }
         int port = uri.getPort();
         switch (scheme) {
@@ -101,7 +102,7 @@ public abstract class NettyHttpClientUtils {
                 }
                 break;
             default:
-                throw new IOException("scheme is unknow");
+                httpCallback.response(null,null,new URISyntaxException(url,"scheme is unknow"));
         }
 
         ChannelFuture channelFuture = bootstrap.connect(uri.getHost(), port);
@@ -163,9 +164,9 @@ public abstract class NettyHttpClientUtils {
 
 
     private static void requestAndParseRespond(String url, String charsetName, HttpExtensionCallback httpExtensionCallback, DefaultFullHttpRequest request) throws IOException {
-        connect(url, request, (ctx, response, cause) -> {
-            if (cause != null) {
-                httpExtensionCallback.response(null, null, null, cause);
+        connect(url, request, (ctx, response, throwable) -> {
+            if (throwable != null) {
+                httpExtensionCallback.response(null, null, null, throwable);
             } else {
                 Charset charset;
                 if (charsetName != null && !charsetName.trim().equals("")) {
@@ -226,8 +227,8 @@ class ResponseHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        httpCallback.response(ctx, null, cause);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable throwable) throws Exception {
+        httpCallback.response(ctx, null, throwable);
         ctx.close();
     }
 }
