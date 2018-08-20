@@ -87,7 +87,7 @@ public abstract class NettyHttpClientUtils {
         URI uri = URI.create(url);
         String scheme = uri.getScheme();
         if (scheme == null || scheme.trim().equals("")) {
-            httpCallback.response(null,null,new URISyntaxException(url,"scheme is empty"));
+            httpCallback.response(null, null, new URISyntaxException(url, "scheme is empty"));
         }
         int port = uri.getPort();
         switch (scheme) {
@@ -102,7 +102,7 @@ public abstract class NettyHttpClientUtils {
                 }
                 break;
             default:
-                httpCallback.response(null,null,new URISyntaxException(url,"scheme is unknow"));
+                httpCallback.response(null, null, new URISyntaxException(url, "scheme is unknow"));
         }
 
         ChannelFuture channelFuture = bootstrap.connect(uri.getHost(), port);
@@ -123,15 +123,15 @@ public abstract class NettyHttpClientUtils {
         });
     }
 
-    public static void doGet(String url, Map<String, String> headers, String charsetName, HttpExtensionCallback httpExtensionCallback) throws IOException {
+    public static void doGet(String url, Map<String, String> headers, String charsetName, HttpExtensionCallback httpExtensionCallback) {
         DefaultFullHttpRequest request = new DefaultFullHttpRequest(HTTP_1_1, GET, url);
         setHeaders(headers, request);
         requestAndParseRespond(url, charsetName, httpExtensionCallback, request);
     }
 
-    public static void doPost(String url, Map<String, String> headers, ByteBuf body, String charsetName, AsciiString contentType, HttpExtensionCallback httpExtensionCallback) throws IOException {
+    public static void doPost(String url, Map<String, String> headers, ByteBuf body, String charsetName, AsciiString contentType, HttpExtensionCallback httpExtensionCallback) {
         DefaultFullHttpRequest request;
-        if (body != null ) {
+        if (body != null) {
             request = new DefaultFullHttpRequest(HTTP_1_1, POST, url, body);
         } else {
             request = new DefaultFullHttpRequest(HTTP_1_1, POST, url);
@@ -143,27 +143,27 @@ public abstract class NettyHttpClientUtils {
         requestAndParseRespond(url, charsetName, httpExtensionCallback, request);
     }
 
-    public static void doPostForm(String url, Map<String, String> headers, Map<String, String> param, String charsetName, HttpExtensionCallback httpExtensionCallback) throws IOException {
+    public static void doPostForm(String url, Map<String, String> headers, Map<String, String> param, String charsetName, HttpExtensionCallback httpExtensionCallback) {
         if (param != null && param.size() > 0) {
-            ByteBuf body = buildFormBody(param,charsetName);
-            doPost(url,headers,body,charsetName,HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED,httpExtensionCallback);
+            ByteBuf body = buildFormBody(param, charsetName);
+            doPost(url, headers, body, charsetName, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED, httpExtensionCallback);
         } else {
-            doPost(url,headers,null,charsetName,HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED,httpExtensionCallback);
+            doPost(url, headers, null, charsetName, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED, httpExtensionCallback);
         }
     }
 
-    public static void doPostJson(String url, Map<String, String> headers, String json, String charsetName, HttpExtensionCallback httpExtensionCallback) throws IOException {
-        if (json!=null&&!json.trim().equals("")) {
+    public static void doPostJson(String url, Map<String, String> headers, String json, String charsetName, HttpExtensionCallback httpExtensionCallback) {
+        if (json != null && !json.trim().equals("")) {
             byte[] bodyBytes = json.getBytes();
             ByteBuf body = PooledByteBufAllocator.DEFAULT.buffer(bodyBytes.length).writeBytes(bodyBytes);
-            doPost(url,headers,body,charsetName,HttpHeaderValues.APPLICATION_JSON,httpExtensionCallback);
+            doPost(url, headers, body, charsetName, HttpHeaderValues.APPLICATION_JSON, httpExtensionCallback);
         } else {
-            doPost(url,headers,null,charsetName,HttpHeaderValues.APPLICATION_JSON,httpExtensionCallback);
+            doPost(url, headers, null, charsetName, HttpHeaderValues.APPLICATION_JSON, httpExtensionCallback);
         }
     }
 
 
-    private static void requestAndParseRespond(String url, String charsetName, HttpExtensionCallback httpExtensionCallback, DefaultFullHttpRequest request) throws IOException {
+    private static void requestAndParseRespond(String url, String charsetName, HttpExtensionCallback httpExtensionCallback, DefaultFullHttpRequest request) {
         connect(url, request, (ctx, response, throwable) -> {
             if (throwable != null) {
                 httpExtensionCallback.response(null, null, null, throwable);
@@ -182,18 +182,18 @@ public abstract class NettyHttpClientUtils {
         });
     }
 
-    private static ByteBuf buildFormBody(Map<String, String> param,String charsetName) {
+    private static ByteBuf buildFormBody(Map<String, String> param, String charsetName) {
         final String charsetNameFin;
-        if (charsetName==null||charsetName.trim().equals("")){
+        if (charsetName == null || charsetName.trim().equals("")) {
             charsetNameFin = "utf-8";
-        }else {
+        } else {
             charsetNameFin = charsetName;
         }
         StringBuffer sb = new StringBuffer();
 
         param.forEach((key, value) -> {
             try {
-                sb.append(URLEncoder.encode(key,charsetNameFin)).append(FORM_EQUAL_SIGN).append(URLEncoder.encode(value,charsetNameFin)).append(FORM_AND_SIGN);
+                sb.append(URLEncoder.encode(key, charsetNameFin)).append(FORM_EQUAL_SIGN).append(URLEncoder.encode(value, charsetNameFin)).append(FORM_AND_SIGN);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
