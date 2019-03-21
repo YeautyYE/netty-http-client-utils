@@ -9,6 +9,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslProvider;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.util.AsciiString;
 
 import javax.net.ssl.SSLException;
@@ -43,7 +45,12 @@ public abstract class NettyHttpClientUtils {
 
     static {
         try {
-            sslCtx = SslContextBuilder.forClient().build();
+//            sslCtx = SslContextBuilder.forClient().build();
+            sslCtx = SslContextBuilder
+                    .forClient()
+                    .sslProvider(SslProvider.JDK)
+                    .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                    .build();
         } catch (SSLException e) {
             e.printStackTrace();
         }
@@ -221,7 +228,11 @@ class ResponseHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpResponse msg) throws Exception {
         if (ctx.channel().isActive()) {
-            httpCallback.response(ctx, msg, null);
+            try {
+                httpCallback.response(ctx, msg, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             ctx.close();
         }
     }
